@@ -12,19 +12,19 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import bt_api_py.security_compliance as security_compliance_module
-import bt_api_py.security_compliance.core.audit_logger as audit_logger_module
-import bt_api_py.security_compliance.core.encryption_manager as encryption_module
-import bt_api_py.security_compliance.framework as framework_module
+import bt_api_security as security_compliance_module
+import bt_api_security.core.audit_logger as audit_logger_module
+import bt_api_security.core.encryption_manager as encryption_module
+import bt_api_security.framework as framework_module
 import pytest
-from bt_api_py.security_compliance.auth.mfa_provider import MFAProvider
-from bt_api_py.security_compliance.auth.oauth2_provider import GrantType, OAuth2Provider, TokenType
-from bt_api_py.security_compliance.core.access_control import (
+from bt_api_security.auth.mfa_provider import MFAProvider
+from bt_api_security.auth.oauth2_provider import GrantType, OAuth2Provider, TokenType
+from bt_api_security.core.access_control import (
     AccessControlManager,
     PermissionLevel,
     Resource,
 )
-from bt_api_py.security_compliance.core.audit_logger import (
+from bt_api_security.core.audit_logger import (
     AuditError,
     AuditEvent,
     AuditLogger,
@@ -34,12 +34,12 @@ from bt_api_py.security_compliance.core.audit_logger import (
     initialize_audit_logger,
     log_audit_event,
 )
-from bt_api_py.security_compliance.core.compliance_monitor import (
+from bt_api_security.core.compliance_monitor import (
     ComplianceMonitor,
     ComplianceRule,
     ComplianceStandard,
 )
-from bt_api_py.security_compliance.core.encryption_manager import (
+from bt_api_security.core.encryption_manager import (
     EncryptionAlgorithm,
     EncryptionError,
     EncryptionManager,
@@ -49,13 +49,13 @@ from bt_api_py.security_compliance.core.encryption_manager import (
     get_encryption_manager,
     initialize_encryption_manager,
 )
-from bt_api_py.security_compliance.core.identity_manager import (
+from bt_api_security.core.identity_manager import (
     IdentityManager,
     IdentityProvider,
     UserStatus,
 )
-from bt_api_py.security_compliance.data.protection import DataProtectionManager
-from bt_api_py.security_compliance.framework import (
+from bt_api_security.data.protection import DataProtectionManager
+from bt_api_security.framework import (
     SecurityFramework,
     audit_access,
     create_security_config_from_env,
@@ -64,7 +64,7 @@ from bt_api_py.security_compliance.framework import (
     integrate_with_bt_api,
     require_permission,
 )
-from bt_api_py.security_compliance.recovery.disaster_recovery import DisasterRecoveryManager
+from bt_api_security.recovery.disaster_recovery import DisasterRecoveryManager
 
 PYOTP_AVAILABLE = importlib.util.find_spec("pyotp") is not None
 
@@ -924,7 +924,7 @@ class TestDisasterRecoveryManager:
 
     def test_create_and_initiate_backup(self, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.setattr(
-            "bt_api_py.security_compliance.recovery.disaster_recovery.time.time",
+            "bt_api_security.recovery.disaster_recovery.time.time",
             lambda: 12345.0,
         )
 
@@ -952,7 +952,7 @@ class TestDisasterRecoveryManager:
 
     def test_create_and_execute_recovery_plan(self, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.setattr(
-            "bt_api_py.security_compliance.recovery.disaster_recovery.time.time",
+            "bt_api_security.recovery.disaster_recovery.time.time",
             lambda: 45678.0,
         )
 
@@ -1270,7 +1270,7 @@ class TestDataProtectionManagerExtended:
 
     def test_init_classifications_and_patterns(self):
         """Test default classifications and anonymization patterns initialization."""
-        from bt_api_py.security_compliance.data.protection import (
+        from bt_api_security.data.protection import (
             DataProtectionManager,
             SensitiveDataType,
         )
@@ -1289,7 +1289,7 @@ class TestDataProtectionManagerExtended:
 
     def test_classify_data_with_email_and_transaction(self):
         """Test data classification identifies PII and transaction data."""
-        from bt_api_py.security_compliance.data.protection import (
+        from bt_api_security.data.protection import (
             DataProtectionManager,
             SensitiveDataType,
         )
@@ -1309,7 +1309,7 @@ class TestDataProtectionManagerExtended:
 
     def test_classify_data_with_credit_card(self):
         """Test data classification identifies financial and PCI_DSS data."""
-        from bt_api_py.security_compliance.data.protection import (
+        from bt_api_security.data.protection import (
             DataProtectionManager,
             SensitiveDataType,
         )
@@ -1325,7 +1325,7 @@ class TestDataProtectionManagerExtended:
 
     def test_mask_data_string_full_and_partial(self):
         """Test string masking with full and partial levels."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         manager = DataProtectionManager(None, {})
 
@@ -1340,7 +1340,7 @@ class TestDataProtectionManagerExtended:
 
     def test_mask_data_dict_and_list(self):
         """Test masking for dict and list data structures."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         manager = DataProtectionManager(None, {})
 
@@ -1354,7 +1354,7 @@ class TestDataProtectionManagerExtended:
 
     def test_mask_data_email_level(self):
         """Test email-specific masking preserves domain."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         manager = DataProtectionManager(None, {})
 
@@ -1364,7 +1364,7 @@ class TestDataProtectionManagerExtended:
 
     def test_anonymize_data_email_and_phone(self):
         """Test data anonymization for email and phone."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         manager = DataProtectionManager(None, {})
 
@@ -1380,7 +1380,7 @@ class TestDataProtectionManagerExtended:
 
     def test_anonymize_data_credit_card_and_ssn(self):
         """Test data anonymization for credit card and SSN."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         manager = DataProtectionManager(None, {})
 
@@ -1396,7 +1396,7 @@ class TestDataProtectionManagerExtended:
 
     def test_register_data_subject_with_consent(self, monkeypatch):
         """Test data subject registration with consent data."""
-        from bt_api_py.security_compliance.data.protection import (
+        from bt_api_security.data.protection import (
             DataProtectionManager,
             DataSubject,
         )
@@ -1419,7 +1419,7 @@ class TestDataProtectionManagerExtended:
 
     def test_record_consent_and_withdraw(self, monkeypatch):
         """Test consent recording and withdrawal."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         monkeypatch.setattr("time.time", lambda: 2000.0)
 
@@ -1446,7 +1446,7 @@ class TestDataProtectionManagerExtended:
 
     def test_withdraw_consent_nonexistent_subject(self):
         """Test withdrawing consent for non-existent subject raises error."""
-        from bt_api_py.security_compliance.data.protection import (
+        from bt_api_security.data.protection import (
             DataProtectionError,
             DataProtectionManager,
         )
@@ -1458,7 +1458,7 @@ class TestDataProtectionManagerExtended:
 
     def test_request_right_to_be_forgotten(self, monkeypatch):
         """Test GDPR right to be forgotten request."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         monkeypatch.setattr("time.time", lambda: 3000.0)
 
@@ -1476,7 +1476,7 @@ class TestDataProtectionManagerExtended:
 
     def test_process_data_deletion(self, monkeypatch):
         """Test processing deletion request."""
-        from bt_api_py.security_compliance.data.protection import (
+        from bt_api_security.data.protection import (
             DataProtectionError,
             DataProtectionManager,
         )
@@ -1500,7 +1500,7 @@ class TestDataProtectionManagerExtended:
 
     def test_check_retention_policies(self):
         """Test retention policy checking."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         manager = DataProtectionManager(None, {})
 
@@ -1511,7 +1511,7 @@ class TestDataProtectionManagerExtended:
 
     def test_generate_data_protection_report(self):
         """Test comprehensive data protection report generation."""
-        from bt_api_py.security_compliance.data.protection import DataProtectionManager
+        from bt_api_security.data.protection import DataProtectionManager
 
         manager = DataProtectionManager(None, {})
 
@@ -1534,7 +1534,7 @@ class TestTLSManager:
 
     def test_default_config_initialization(self):
         """Test TLSManager with default configuration."""
-        from bt_api_py.security_compliance.network.tls_manager import TLSManager
+        from bt_api_security.network.tls_manager import TLSManager
 
         manager = TLSManager({})
 
@@ -1544,7 +1544,7 @@ class TestTLSManager:
 
     def test_custom_config_initialization(self):
         """Test TLSManager with custom configuration."""
-        from bt_api_py.security_compliance.network.tls_manager import TLSManager
+        from bt_api_security.network.tls_manager import TLSManager
 
         manager = TLSManager(
             {
@@ -1562,7 +1562,7 @@ class TestTLSManager:
         """Test SSL context creation with TLS 1.3."""
         import ssl
 
-        from bt_api_py.security_compliance.network.tls_manager import TLSManager
+        from bt_api_security.network.tls_manager import TLSManager
 
         # Use empty cipher_suites to avoid platform-specific cipher errors
         manager = TLSManager({"version": "1.3", "cipher_suites": []})
@@ -1576,7 +1576,7 @@ class TestTLSManager:
         """Test SSL context creation with TLS 1.2."""
         import ssl
 
-        from bt_api_py.security_compliance.network.tls_manager import TLSManager
+        from bt_api_security.network.tls_manager import TLSManager
 
         manager = TLSManager({"version": "1.2", "cipher_suites": []})
         context = manager.get_ssl_context()
@@ -1585,7 +1585,7 @@ class TestTLSManager:
 
     def test_validate_certificate_invalid_path(self):
         """Test certificate validation with non-existent file."""
-        from bt_api_py.security_compliance.network.tls_manager import TLSManager
+        from bt_api_security.network.tls_manager import TLSManager
 
         manager = TLSManager({})
         result = manager.validate_certificate("/nonexistent/path/cert.pem")
@@ -1598,7 +1598,7 @@ class TestSecurityMonitoring:
 
     def test_create_alert_and_handler_notification(self, monkeypatch):
         """Test alert creation with handler notification."""
-        from bt_api_py.security_compliance.monitoring.security_monitoring import (
+        from bt_api_security.monitoring.security_monitoring import (
             AlertSeverity,
             SecurityAlert,
             SecurityMonitoring,
@@ -1638,7 +1638,7 @@ class TestSecurityMonitoring:
 
     def test_get_alerts_filtering_and_sorting(self, monkeypatch):
         """Test alert filtering by severity and acknowledged status."""
-        from bt_api_py.security_compliance.monitoring.security_monitoring import (
+        from bt_api_security.monitoring.security_monitoring import (
             AlertSeverity,
             SecurityMonitoring,
         )
@@ -1675,7 +1675,7 @@ class TestSecurityMonitoring:
 
     def test_acknowledge_and_resolve_alert(self, monkeypatch):
         """Test alert acknowledgment and resolution."""
-        from bt_api_py.security_compliance.monitoring.security_monitoring import (
+        from bt_api_security.monitoring.security_monitoring import (
             AlertSeverity,
             SecurityMonitoring,
         )
@@ -1705,7 +1705,7 @@ class TestSecurityMonitoring:
 
     def test_get_monitoring_summary(self, monkeypatch):
         """Test monitoring summary statistics."""
-        from bt_api_py.security_compliance.monitoring.security_monitoring import (
+        from bt_api_security.monitoring.security_monitoring import (
             AlertSeverity,
             SecurityMonitoring,
         )
@@ -1731,7 +1731,7 @@ class TestSecurityMonitoring:
 
     def test_handler_errors_suppressed(self, monkeypatch):
         """Test that handler exceptions don't break alert creation."""
-        from bt_api_py.security_compliance.monitoring.security_monitoring import (
+        from bt_api_security.monitoring.security_monitoring import (
             AlertSeverity,
             SecurityMonitoring,
         )
